@@ -75,7 +75,7 @@ The core intelligence of this system resides in its backend, which manages the l
 
 ## 🌐 Live Demo
 The application features a modern, futuristic web interface for interacting with your documents.
-[View Live Demo](https://yourusername.github.io/basic_rag_system/)
+[View Live Demo](https://prathambaraskar.github.io/basic_rag_system/)
 
 *Note: The live demo runs in a client-side "Demo Mode". For full RAG backend capabilities, run the provided FastAPI server locally (`python server.py`).*
 
