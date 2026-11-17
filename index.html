@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nexus RAG - Futuristic AI Document Intelligence">
+    <title>Nexus RAG | AI Document Intelligence</title>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+
+    <!-- Atkinson Hyperlegible for content readability -->
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#2563EB',      // Electric Blue
+                            dark: '#1D4ED8',
+                            light: '#3B82F6',
+                            foreground: '#FFFFFF'
+                        },
+                        secondary: {
+                            DEFAULT: '#64748B',      // Slate
+                            dark: '#475569',
+                            light: '#94A3B8',
+                            foreground: '#FFFFFF'
+                        },
+                        accent: {
+                            DEFAULT: '#06B6D4',      // Cyan
+                            dark: '#0891B2',
+                            light: '#22D3EE',
+                            foreground: '#0C1A2C'
+                        },
+                        surface: {
+                            DEFAULT: '#FFFFFF',
+                            secondary: '#F8FAFC',
+                            tertiary: '#F1F5F9',
+                            border: '#E2E8F0',
+                            hover: '#F8FAFC'
+                        },
+                        text: {
+                            primary: '#0F172A',
+                            secondary: '#334155',
+                            tertiary: '#64748B',
+                            muted: '#94A3B8',
+                            inverse: '#FFFFFF'
+                        },
+                        status: {
+                            success: '#10B981',
+                            warning: '#F59E0B',
+                            error: '#EF4444',
+                            info: '#2563EB'
+                        },
+                        glow: {
+                            blue: 'rgba(37, 99, 235, 0.15)',
+                            cyan: 'rgba(6, 182, 212, 0.15)',
+                            white: 'rgba(255, 255, 255, 0.8)'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
+                        body: ['Atkinson Hyperlegible', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    },
+                    boxShadow: {
+                        'glow-sm': '0 0 10px rgba(37, 99, 235, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04)',
+                        'glow': '0 0 20px rgba(37, 99, 235, 0.2), 0 4px 16px rgba(0, 0, 0, 0.06)',
+                        'glow-lg': '0 0 40px rgba(37, 99, 235, 0.25), 0 8px 32px rgba(0, 0, 0, 0.08)',
+                        'card': '0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06)',
+                        'elevated': '0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-primary: #F8FAFC;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #334155;
+        }
+
+        body {
+            font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .font-display { font-family: 'Space Grotesk', system-ui, sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+
+        .bg-grid-pattern {
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .bg-mesh {
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.12), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(6, 182, 212, 0.08), transparent),
+                var(--bg-primary);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(226, 232, 240, 1);
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #2563EB, #06B6D4);
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            @apply relative overflow-hidden px-6 py-3 font-display font-semibold text-base text-white rounded-xl
+                   bg-gradient-to-r from-primary to-primary-dark shadow-glow transition-all duration-300 ease-out
+                   hover:shadow-glow-lg hover:-translate-y-0.5 active:scale-[0.98]
+                   disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none;
+        }
+
+        .btn-secondary {
+            @apply relative px-6 py-3 font-display font-medium text-base text-text-primary rounded-xl
+                   bg-surface border border-border hover:bg-surface-hover hover:border-primary/50
+                   shadow-card transition-all duration-300 ease-out hover:-translate-y-0.5 active:scale-[0.98];
+        }
+
+        .btn-ghost {
+            @apply relative px-4 py-2 font-display font-medium text-sm text-text-secondary rounded-lg
+                   bg-transparent hover:bg-surface hover:text-text-primary transition-all duration-200;
+        }
+
+        .btn-icon {
+            @apply p-2.5 rounded-lg text-text-tertiary hover:text-text-primary bg-transparent hover:bg-surface transition-all duration-200;
+        }
+
+        .card {
+            @apply bg-surface border border-border rounded-2xl shadow-card transition-all duration-300 hover:shadow-card-hover hover:border-primary/30;
+        }
+
+        .input-field {
+            @apply w-full px-4 py-3.5 text-text-primary bg-surface border border-border rounded-xl
+                   placeholder:text-text-muted font-body text-base transition-all duration-200
+                   hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20;
+        }
+
+        .source-citation {
+            @apply inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-tertiary border border-border rounded-lg
+                   text-sm font-medium text-text-secondary transition-all duration-200
+                   hover:bg-surface-hover hover:border-primary/50 hover:shadow-glow-sm cursor-pointer;
+        }
+
+        .toast {
+            @apply fixed bottom-6 left-6 z-50 glass-strong rounded-xl shadow-elevated
+                   px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-md
+                   transform transition-all duration-300 ease-out animate-slide-up;
+        }
+
+        .toast.success { @apply border-l-4 border-status-success; }
+        .toast.error { @apply border-l-4 border-status-error; }
+        .toast.warning { @apply border-l-4 border-status-warning; }
+        .toast.info { @apply border-l-4 border-status-info; }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-mesh bg-grid-pattern min-h-screen">
+
+    <!-- Floating Particles -->
+    <div id="particles" class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true"></div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-6 left-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 min-h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="glass-strong border-b border-border sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16 lg:h-18">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 rounded-xl bg-gradient-to-br from-primary to-accent shadow-glow-sm text-white">
+                            <i data-lucide="cpu" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-display text-xl font-bold text-text-primary tracking-tight">Nexus RAG</h1>
+                            <p class="font-body text-xs text-text-tertiary">AI Document Intelligence</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border glass">
+                            <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-status-error"></span>
+                            <span id="status-text" class="font-display text-sm font-medium text-text-secondary">Disconnected</span>
+                        </div>
+
+                        <button id="theme-toggle" class="btn-icon" title="Toggle glow mode">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-primary"></i>
+                        </button>
+
+                        <button id="sidebar-toggle" class="btn-icon lg:hidden" aria-label="Toggle sidebar">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <main class="flex-1 flex overflow-hidden">
+
+            <!-- Sidebar -->
+            <aside id="sidebar" class="lg:w-72 w-64 flex-shrink-0 glass border-r border-border flex flex-col transition-transform duration-300 ease-out transform lg:translate-x-0 -translate-x-full fixed lg:relative inset-y-0 left-0 z-30">
+                <div class="p-4 border-b border-border flex items-center justify-between">
+                    <h2 class="font-display text-lg font-semibold text-text-primary">Knowledge Base</h2>
+                    <button id="close-sidebar" class="btn-icon lg:hidden">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Upload Box -->
+                <div class="p-4 border-b border-border">
+                    <label for="pdf-upload" class="relative border-2 border-dashed border-border rounded-2xl p-6 text-center block cursor-pointer hover:border-primary/50 hover:bg-surface-hover transition-all group">
+                        <input type="file" id="pdf-upload" accept=".pdf" multiple class="absolute inset-0 opacity-0 cursor-pointer">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                        </div>
+                        <p class="font-display text-sm font-medium text-text-primary mb-1">Upload PDFs</p>
+                        <p class="font-body text-xs text-text-tertiary">Click or drag files here</p>
+                    </label>
+                </div>
+
+                <!-- Documents List -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-2" id="documents-list">
+                    <div id="empty-state" class="flex flex-col items-center justify-center py-12 text-center">
+                        <i data-lucide="file-text" class="w-12 h-12 text-text-muted mb-3 opacity-50"></i>
+                        <p class="font-display text-sm font-medium text-text-secondary">No documents</p>
+                        <p class="font-body text-xs text-text-tertiary">Upload PDFs to start</p>
+                    </div>
+                </div>
+
+                <!-- Sidebar Footer -->
+                <div class="p-4 border-t border-border space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-text-tertiary">Documents</span>
+                        <span id="doc-count" class="font-display font-semibold text-text-primary">0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-text-tertiary">Chunks</span>
+                        <span id="chunk-count" class="font-display font-semibold text-text-primary">0</span>
+                    </div>
+                    <button id="clear-all-btn" class="btn-secondary w-full justify-center gap-2 text-sm" disabled>
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Clear Knowledge Base
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Chat Area -->
+            <section class="flex-1 flex flex-col min-w-0">
+                <div class="glass-strong border-b border-border p-4 sm:p-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="font-display text-2xl font-bold text-text-primary">Document Chat</h2>
+                        <p class="font-body text-sm text-text-tertiary mt-0.5">Ask questions and retrieve precise answers</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="new-chat-btn" class="btn-secondary flex items-center gap-2 text-sm">
+                            <i data-lucide="plus" class="w-4 h-4"></i> New Chat
+                        </button>
+                        <button id="settings-btn" class="btn-icon" title="Settings">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                    <!-- Initial Greeting -->
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typing-indicator" class="hidden px-6 pb-4 flex justify-start">
+                    <div class="glass px-4 py-3 rounded-2xl border border-border shadow-card flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.2s]"></div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></div>
+                        <span class="font-body text-xs text-text-tertiary ml-2">Searching vector database & generating...</span>
+                    </div>
+                </div>
+
+                <!-- Chat Input Form -->
+                <div class="glass-strong border-t border-border p-4 sm:p-6">
+                    <form id="chat-form" class="flex items-end gap-3">
+                        <button type="button" id="attach-btn" class="btn-icon flex-shrink-0" title="Upload PDF">
+                            <i data-lucide="paperclip" class="w-5 h-5"></i>
+                        </button>
+                        <div class="flex-1 relative">
+                            <textarea id="chat-input" rows="1" placeholder="Ask a question about your documents..." class="input-field resize-none min-h-[50px] max-h-[150px] pr-12"></textarea>
+                            <div class="absolute right-3 bottom-3 text-xs font-mono text-text-muted">
+                                <span id="current-chars">0</span>/4000
+                            </div>
+                        </div>
+                        <button type="submit" id="send-btn" class="btn-primary flex-shrink-0" disabled>
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Mobile FAB -->
+        <button id="fab" class="fab lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-primary text-white shadow-glow flex items-center justify-center">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="settings-backdrop"></div>
+        <div class="relative w-full max-w-md glass-strong rounded-2xl shadow-elevated border border-border p-6 space-y-6">
+            <div class="flex items-center justify-between border-b border-border pb-4">
+                <h3 class="font-display text-lg font-semibold text-text-primary">RAG Configuration</h3>
+                <button id="close-settings" class="btn-icon"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-text-secondary block mb-1">Results Count (k): <span id="k-display" class="text-primary font-bold">4</span></label>
+                    <input type="range" id="k-value" min="1" max="10" value="4" class="w-full accent-primary">
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-text-secondary block mb-1">Fetch Count (fetch_k): <span id="fetch-k-display" class="text-primary font-bold">10</span></label>
+                    <input type="range" id="fetch-k-value" min="5" max="25" value="10" class="w-full accent-primary">
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-text-secondary block mb-1">Diversity (lambda_mult): <span id="lambda-display" class="text-primary font-bold">0.5</span></label>
+                    <input type="range" id="lambda-value" min="0" max="1" step="0.1" value="0.5" class="w-full accent-primary">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4 border-t border-border">
+                <button id="reset-settings" class="btn-ghost text-sm">Reset Defaults</button>
+                <button id="save-settings" class="btn-primary text-sm">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="confirm-backdrop"></div>
+        <div class="relative w-full max-w-md glass-strong rounded-2xl shadow-elevated border border-border p-6 space-y-4">
+            <h3 class="font-display text-lg font-semibold text-text-primary">Clear Knowledge Base</h3>
+            <p class="text-sm text-text-secondary">Are you sure you want to delete all uploaded documents and vectors?</p>
+            <div class="flex justify-end gap-3 pt-4 border-t border-border">
+                <button id="confirm-cancel" class="btn-secondary text-sm">Cancel</button>
+                <button id="confirm-ok" class="btn-primary bg-status-error text-sm">Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Source Detail Modal -->
+    <div id="source-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="source-backdrop"></div>
+        <div class="relative w-full max-w-lg glass-strong rounded-2xl shadow-elevated border border-border p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-border pb-3">
+                <h3 id="source-modal-title" class="font-display text-lg font-semibold text-text-primary">Source Snippet</h3>
+                <button id="close-source-modal" class="btn-icon"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="source-modal-content" class="font-body text-sm text-text-secondary bg-surface-tertiary p-4 rounded-xl border border-border max-h-60 overflow-y-auto"></div>
+            <div class="flex justify-end pt-2">
+                <button id="close-source-btn" class="btn-primary text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

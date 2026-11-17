@@ -1,0 +1,65 @@
+
+# ==========================================
+# RAG APPLICATION - REQUIREMENTS
+# ==========================================
+
+# 1. Core Python Utilities
+python-dotenv
+pydantic
+pydantic-settings
+typing-extensions
+
+# 2. AI MODEL PROVIDERS
+openai
+openrouter
+mistralai
+groq
+
+# 3. RAG FRAMEWORK
+langchain
+langchain-core
+langchain-text-splitters
+langchain-openai
+langchain-groq
+langchain-mistralai
+
+# 4. VECTOR DATABASE
+chromadb
+
+# 5. EMBEDDINGS
+sentence-transformers
+transformers
+torch
+
+# 6. DOCUMENT LOADERS
+pypdf
+python-docx
+docx2txt
+openpyxl
+pandas
+beautifulsoup4
+unstructured
+
+# 7. API / BACKEND
+fastapi
+uvicorn
+python-multipart
+
+# 8. HTTP REQUESTS
+requests
+httpx
+aiohttp
+
+# 9. DATA PROCESSING
+numpy
+scikit-learn
+
+# 10. FRONTEND
+streamlit
+
+# 11. LOGGING
+loguru
+
+# 12. DEVELOPMENT / TESTING
+pytest
+ipykernel
