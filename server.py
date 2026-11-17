@@ -39,8 +39,9 @@ model = ChatOpenRouter(model="auto")
 
 prompt = ChatPromptTemplate.from_messages([
     ("system",
-     """you are a helpful ai assistant.
-     use only the provided context to answer the question.
+     """You are an advanced AI document intelligence assistant.
+     Use ONLY the provided context to answer the user's question thoroughly and comprehensively.
+     Provide detailed, comprehensive explanations structured in multiple well-formatted paragraphs. Avoid brief one-liners and expand on the context fully.
 
      if the answer is not present in the context, say: "I could not find the answer in the document." """),
     ("human", """ Context: {context}

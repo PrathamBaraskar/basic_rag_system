@@ -324,21 +324,18 @@
                     </div>
                 </div>
 
-                <!-- Chat Input Form -->
-                <div class="glass-strong border-t border-border p-4 sm:p-6">
-                    <form id="chat-form" class="flex items-end gap-3">
-                        <button type="button" id="attach-btn" class="btn-icon flex-shrink-0" title="Upload PDF">
-                            <i data-lucide="paperclip" class="w-5 h-5"></i>
-                        </button>
-                        <div class="flex-1 relative">
-                            <textarea id="chat-input" rows="1" placeholder="Ask a question about your documents..." class="input-field resize-none min-h-[50px] max-h-[150px] pr-12"></textarea>
-                            <div class="absolute right-3 bottom-3 text-xs font-mono text-text-muted">
-                                <span id="current-chars">0</span>/4000
-                            </div>
+                <!-- Chat Input Form (ChatGPT Style) -->
+                <div class="p-4 sm:p-6 bg-transparent">
+                    <form id="chat-form" class="max-w-4xl mx-auto relative">
+                        <div class="relative glass-strong rounded-3xl shadow-glow-lg border border-border/50 p-2 flex items-end gap-2">
+                            <button type="button" id="attach-btn" class="btn-icon flex-shrink-0 ml-1" title="Upload PDF">
+                                <i data-lucide="plus-circle" class="w-6 h-6 text-primary"></i>
+                            </button>
+                            <textarea id="chat-input" rows="1" placeholder="Ask a question about your documents..." class="w-full bg-transparent p-4 text-text-primary placeholder:text-text-muted font-body text-base resize-none outline-none min-h-[50px] max-h-[200px]"></textarea>
+                            <button type="submit" id="send-btn" class="p-3 rounded-2xl bg-primary text-white hover:bg-primary-dark transition-all disabled:opacity-50" disabled>
+                                <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                            </button>
                         </div>
-                        <button type="submit" id="send-btn" class="btn-primary flex-shrink-0" disabled>
-                            <i data-lucide="send" class="w-5 h-5"></i>
-                        </button>
                     </form>
                 </div>
             </section>

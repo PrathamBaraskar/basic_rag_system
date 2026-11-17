@@ -351,24 +351,26 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {}
         }
 
-        // Demo Mode Simulated Response
+        // Demo Mode Simulated Response - Comprehensive multi-paragraph responses
         setTimeout(() => {
             el.typingIndicator.classList.add('hidden');
             state.isProcessing = false;
 
-            let reply = `Based on your documents, **${query}** is a key topic. Using vector retrieval (k=${state.settings.k}), relevant segments were matched successfully.`;
+            let reply;
             if (query.toLowerCase().includes('habit')) {
-                reply = `According to *Atomic Habits*, small habits compound into remarkable results over time through consistent 1% improvements.`;
+                reply = `Based on *Atomic Habits* by James Clear, the core philosophy centers on the compounding power of small, consistent improvements—what Clear calls "atomic habits." Rather than pursuing dramatic overnight transformations, the book emphasizes that remarkable results emerge from the accumulation of hundreds of tiny decisions made daily.\n\nThe framework operates on four laws of behavior change: make it obvious, make it attractive, make it easy, and make it satisfying. Each law corresponds to a stage in the habit loop (cue, craving, response, reward) and provides actionable strategies for building good habits or breaking bad ones. For example, implementation intentions ("I will [behavior] at [time] in [location]") and habit stacking ("After [current habit], I will [new habit]") make cues obvious and behaviors automatic.\n\nCritically, the book argues that identity-based habits—where you focus on who you want to become rather than what you want to achieve—create lasting change. When your habits align with your desired identity, each action becomes a vote for the type of person you wish to be, reinforcing the behavior through self-perception.`;
             } else if (query.toLowerCase().includes('rag')) {
-                reply = `Retrieval-Augmented Generation (RAG) queries vector stores to provide accurate contextual answers and prevent LLM hallucination.`;
+                reply = `Retrieval-Augmented Generation (RAG) is an architectural pattern that combines the parametric knowledge of large language models with the precise, up-to-date information retrieval from external knowledge bases. Rather than relying solely on the model's training data—which has a knowledge cutoff and can hallucinate—RAG grounds responses in verifiable source documents.\n\nThe pipeline typically involves three stages: indexing, retrieval, and generation. During indexing, documents are chunked, embedded using models like Mistral Embed, and stored in a vector database such as ChromaDB. At query time, the user's question is embedded and compared against the vector store using semantic similarity search—often enhanced with Maximum Marginal Relevance (MMR) to balance relevance and diversity. The top-k retrieved chunks form the context window passed to the LLM.\n\nThis approach offers several advantages: it enables domain-specific expertise without fine-tuning, provides source citations for auditability, and allows the knowledge base to be updated in real-time by adding new documents to the vector store. The system you're using implements this exact pattern with ChromaDB for storage, MistralAI for embeddings, and OpenRouter for LLM access.`;
+            } else {
+                reply = `Based on the documents in your knowledge base, **${query}** relates to the core principles of information retrieval and contextual understanding. The system uses semantic vector search to find the most relevant passages, then synthesizes a comprehensive answer grounded in those sources.\n\nWhen processing your query, the RAG pipeline first converts your question into a vector embedding using Mistral's embedding model. This embedding is then compared against the ChromaDB vector store using Maximum Marginal Relevance (MMR) search, which balances semantic similarity with diversity to ensure broad coverage of relevant information. The retrieved context—typically the top 4 most relevant chunks—is then passed to the language model along with your question.\n\nThe language model generates a response strictly based on the provided context, ensuring accuracy and preventing hallucination. Each response includes source citations so you can verify the information against the original documents. This approach makes the system particularly effective for domain-specific questions where precision and traceability are essential.`;
             }
 
             state.messages.push({
                 role: 'ai',
                 content: reply,
                 sources: [
-                    { title: state.documents[0]?.name || 'Document.pdf', page: 5, snippet: query },
-                    { title: state.documents[1]?.name || 'Architecture.pdf', page: 12, snippet: 'Embedding search vector comparison...' }
+                    { title: state.documents[0]?.name || 'Atomic Habits.pdf', page: 5, snippet: query },
+                    { title: state.documents[1]?.name || 'RAG Architecture.pdf', page: 12, snippet: 'Embedding search vector comparison...' }
                 ],
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
@@ -398,13 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
     el.pdfUpload.addEventListener('change', (e) => handleFiles(e.target.files));
     el.attachBtn.addEventListener('click', () => el.pdfUpload.click());
 
-    // 4. Chat Input Auto-resize & Counter
+    // 4. Chat Input Auto-resize
     el.chatInput.addEventListener('input', (e) => {
         const val = e.target.value;
-        el.currentChars.textContent = val.length;
         el.sendBtn.disabled = val.trim().length === 0;
         e.target.style.height = 'auto';
-        e.target.style.height = `${Math.min(e.target.scrollHeight, 150)}px`;
+        e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
     });
 
     el.chatInput.addEventListener('keydown', (e) => {
