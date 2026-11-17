@@ -109,6 +109,21 @@ async def upload_pdf(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+def _extract_text_content(content):
+    """Extract text from various LangChain response content formats."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        # Handle list of content blocks (e.g., [{"type": "text", "text": "..."}])
+        texts = []
+        for block in content:
+            if isinstance(block, dict) and "text" in block:
+                texts.append(block["text"])
+            elif isinstance(block, str):
+                texts.append(block)
+        return "".join(texts)
+    return str(content)
+
 @app.post("/api/query")
 async def query_rag(req: QueryRequest):
     try:
@@ -126,6 +141,9 @@ async def query_rag(req: QueryRequest):
 
         response = model.invoke(final_prompt)
 
+        # Safely extract text content from response
+        answer_text = _extract_text_content(response.content)
+
         sources = []
         for doc in docs:
             source_name = os.path.basename(doc.metadata.get("source", "Document.pdf"))
@@ -137,7 +155,7 @@ async def query_rag(req: QueryRequest):
             })
 
         return {
-            "answer": response.content,
+            "answer": answer_text,
             "sources": sources
         }
     except Exception as e:
