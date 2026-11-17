@@ -40,8 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatForm: document.getElementById('chat-form'),
         chatInput: document.getElementById('chat-input'),
         sendBtn: document.getElementById('send-btn'),
-        currentChars: document.getElementById('current-chars'),
-        newChatBtn: document.getElementById('new-chat-btn'),
+                newChatBtn: document.getElementById('new-chat-btn'),
         settingsBtn: document.getElementById('settings-btn'),
         settingsModal: document.getElementById('settings-modal'),
         closeSettings: document.getElementById('close-settings'),
@@ -313,7 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         el.chatInput.value = '';
-        el.currentChars.textContent = '0';
         el.sendBtn.disabled = true;
         el.chatInput.style.height = 'auto';
         renderMessages();
@@ -402,8 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Chat Input Auto-resize
     el.chatInput.addEventListener('input', (e) => {
-        const val = e.target.value;
-        el.sendBtn.disabled = val.trim().length === 0;
+        el.sendBtn.disabled = e.target.value.trim().length === 0;
         e.target.style.height = 'auto';
         e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
     });
