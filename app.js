@@ -108,9 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Backend Health Check
+    // Helper to determine API URL
+    const API_BASE = window.location.hostname === 'localhost' || window.location.protocol === 'file:'
+        ? 'http://localhost:8000'
+        : 'https://<your-huggingface-space-url>.hf.space'; // <--- UPDATE THIS TO YOUR SPACE URL
+
     async function checkBackend() {
         try {
-            const res = await fetch('/api/documents');
+            const res = await fetch(`${API_BASE}/api/documents`);
             if (res.ok) {
                 const data = await res.json();
                 state.documents = data.documents || [];
@@ -273,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('file', file);
                 showToast(`Uploading ${file.name} to server...`, 'info');
                 try {
-                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                    const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: formData });
                     if (res.ok) {
                         const data = await res.json();
                         state.documents.push({
@@ -329,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (state.isConnected) {
             try {
-                const res = await fetch('/api/query', {
+                const res = await fetch(`${API_BASE}/api/query`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
