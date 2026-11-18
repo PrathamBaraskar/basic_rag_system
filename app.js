@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Helper to determine API URL
     const API_BASE = window.location.hostname === 'localhost' || window.location.protocol === 'file:'
         ? 'http://localhost:8000'
-        : 'https://<your-huggingface-space-url>.hf.space'; // <--- UPDATE THIS TO YOUR SPACE URL
+        : 'https://YOUR_USERNAME-nexus-rag-backend.hf.space'; // <-- UPDATE THIS TO YOUR GRADIO SPACE URL
 
     async function checkBackend() {
         try {
