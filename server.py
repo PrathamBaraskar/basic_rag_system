@@ -3,6 +3,7 @@ import shutil
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
@@ -18,6 +19,14 @@ from langchain_core.prompts import ChatPromptTemplate
 load_dotenv()
 
 app = FastAPI(title="Nexus RAG API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Ensure directories exist
 os.makedirs("chroma_db", exist_ok=True)
@@ -163,6 +172,6 @@ async def query_rag(req: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    print("🚀 Starting Nexus RAG Server at http://localhost:8000")
-    print("📁 Open index.html directly in your browser or visit http://localhost:8000")
+    print("Starting Nexus RAG Server at http://localhost:8000")
+    print("Open index.html directly in your browser or visit http://localhost:8000")
     uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)

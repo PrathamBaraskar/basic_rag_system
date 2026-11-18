@@ -31,7 +31,7 @@ model = ChatOpenRouter(model = "auto")
 prompt = ChatPromptTemplate.from_messages([
     ("system",
      """ you are a helpful ai assistant.
-     use only the provided context to answer the question.
+     read the documents the user have given take the context from the documents and then answer the user using that context make sure you explain everything in a detailed and simple way using the context.
      
      if the answer is not present in the context, say: "I could not find the answer in the document." """),
      ("human", """ Context: {context}

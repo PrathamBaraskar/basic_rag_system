@@ -117,8 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 setConnected(true);
                 renderDocuments();
                 return;
+            } else {
+                console.error('Backend health check failed with status:', res.status);
             }
-        } catch (e) {}
+        } catch (e) {
+            console.error('Backend health check error:', e);
+        }
 
         // Fallback demo docs
         state.documents = [
@@ -135,8 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
             el.statusDot.className = 'w-2.5 h-2.5 rounded-full bg-status-success shadow-[0_0_8px_#10B981]';
             el.statusText.textContent = 'Backend Connected';
         } else {
-            el.statusDot.className = 'w-2.5 h-2.5 rounded-full bg-status-error shadow-[0_0_8px_#EF4444]';
-            el.statusText.textContent = 'Demo Mode (Offline)';
+            el.statusDot.className = 'w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_#06B6D4]';
+            el.statusText.textContent = 'Interactive Demo Mode';
         }
     }
 
@@ -280,10 +284,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         showToast(`Successfully indexed ${file.name} (${data.chunks} chunks)`, 'success');
                     } else {
-                        showToast(`Upload failed for ${file.name}`, 'error');
+                        const errorData = await res.json().catch(() => ({ detail: 'Upload failed' }));
+                        console.error('Upload error:', res.status, errorData);
+                        showToast(`Upload failed: ${errorData.detail}`, 'error');
                     }
                 } catch (e) {
-                    showToast(`Backend upload error`, 'error');
+                    console.error('Upload fetch error:', e);
+                    showToast('Network error during upload', 'error');
                 }
             } else {
                 // Demo Mode
@@ -345,8 +352,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     renderMessages();
                     return;
+                } else {
+                    const errorData = await res.json().catch(() => ({ detail: 'Unknown error' }));
+                    console.error('Query API error:', res.status, errorData);
+                    showToast(`Query failed: ${errorData.detail || 'Server error'}`, 'error');
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error('Query fetch error:', e);
+                showToast('Network error - check console for details', 'error');
+            }
         }
 
         // Demo Mode Simulated Response - Comprehensive multi-paragraph responses
@@ -357,8 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let reply;
             if (query.toLowerCase().includes('habit')) {
                 reply = `Based on *Atomic Habits* by James Clear, the core philosophy centers on the compounding power of small, consistent improvements—what Clear calls "atomic habits." Rather than pursuing dramatic overnight transformations, the book emphasizes that remarkable results emerge from the accumulation of hundreds of tiny decisions made daily.\n\nThe framework operates on four laws of behavior change: make it obvious, make it attractive, make it easy, and make it satisfying. Each law corresponds to a stage in the habit loop (cue, craving, response, reward) and provides actionable strategies for building good habits or breaking bad ones. For example, implementation intentions ("I will [behavior] at [time] in [location]") and habit stacking ("After [current habit], I will [new habit]") make cues obvious and behaviors automatic.\n\nCritically, the book argues that identity-based habits—where you focus on who you want to become rather than what you want to achieve—create lasting change. When your habits align with your desired identity, each action becomes a vote for the type of person you wish to be, reinforcing the behavior through self-perception.`;
-            } else if (query.toLowerCase().includes('rag')) {
+            } else if (query.toLowerCase().includes('rag') || query.toLowerCase().includes('retrieval')) {
                 reply = `Retrieval-Augmented Generation (RAG) is an architectural pattern that combines the parametric knowledge of large language models with the precise, up-to-date information retrieval from external knowledge bases. Rather than relying solely on the model's training data—which has a knowledge cutoff and can hallucinate—RAG grounds responses in verifiable source documents.\n\nThe pipeline typically involves three stages: indexing, retrieval, and generation. During indexing, documents are chunked, embedded using models like Mistral Embed, and stored in a vector database such as ChromaDB. At query time, the user's question is embedded and compared against the vector store using semantic similarity search—often enhanced with Maximum Marginal Relevance (MMR) to balance relevance and diversity. The top-k retrieved chunks form the context window passed to the LLM.\n\nThis approach offers several advantages: it enables domain-specific expertise without fine-tuning, provides source citations for auditability, and allows the knowledge base to be updated in real-time by adding new documents to the vector store. The system you're using implements this exact pattern with ChromaDB for storage, MistralAI for embeddings, and OpenRouter for LLM access.`;
+            } else if (query.toLowerCase().includes('gradient') || query.toLowerCase().includes('descent') || query.toLowerCase().includes('machine learning')) {
+                reply = `Gradient descent is an iterative optimization algorithm used in machine learning and deep learning to find the minimum of a cost function (such as mean squared error in regression or cross-entropy in classification). It works by taking repeated steps in the opposite direction of the gradient (or approximate gradient) of the function at the current point, where the gradient points in the direction of the steepest ascent.\n\nThe size of each step is determined by the learning rate ($\\alpha$), a hyperparameter that controls how fast or slow the model converges toward the minimum. If the learning rate is too large, the algorithm may overshoot the minimum or diverge; if it is too small, convergence can take an impractically long time.\n\nIn the context of modern AI systems and vector embeddings, optimization algorithms like gradient descent underpin neural network training, allowing models to learn dense vector representations that capture semantic meaning. When paired with vector stores like ChromaDB and retrieval pipelines, these models enable highly accurate semantic search and grounded generation.`;
             } else {
                 reply = `Based on the documents in your knowledge base, **${query}** relates to the core principles of information retrieval and contextual understanding. The system uses semantic vector search to find the most relevant passages, then synthesizes a comprehensive answer grounded in those sources.\n\nWhen processing your query, the RAG pipeline first converts your question into a vector embedding using Mistral's embedding model. This embedding is then compared against the ChromaDB vector store using Maximum Marginal Relevance (MMR) search, which balances semantic similarity with diversity to ensure broad coverage of relevant information. The retrieved context—typically the top 4 most relevant chunks—is then passed to the language model along with your question.\n\nThe language model generates a response strictly based on the provided context, ensuring accuracy and preventing hallucination. Each response includes source citations so you can verify the information against the original documents. This approach makes the system particularly effective for domain-specific questions where precision and traceability are essential.`;
             }
